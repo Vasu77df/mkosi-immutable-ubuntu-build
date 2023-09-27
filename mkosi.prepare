@@ -1,0 +1,81 @@
+#!/bin/bash
+
+if [ "$container" != "mkosi" ]; then
+    exec mkosi-chroot "$SCRIPT" "$@"
+fi
+
+set -eExuo pipefail
+
+trap "cleanup_downloads" ERR
+
+function cleanup_downloads() {
+    echo -e "==>Cleaning up downloaded artifacts"
+    # remove downloaded transient artifacts
+    rm -rf "$temp_dir"
+    echo -e "---Cleanup Complete---"
+}
+
+function install_cloudwatch_agent() {
+    echo "===> Installing Cloudwatch Agent"
+    if (command -v amazon-cloudwatch-agent-ctl 2>&1); then
+        echo "---Cloudwatch Agent is already installed!---"
+    else
+        curl https://s3.amazonaws.com/amazoncloudwatch-agent/ubuntu/amd64/latest/amazon-cloudwatch-agent.deb  -o "$temp_dir/amazon-cloudwatch-agent.deb"
+        dpkg -i "$temp_dir"/amazon-cloudwatch-agent.deb
+    if (command -v amazon-cloudwatch-agent-ctl 2>&1); then
+            echo "---Cloudwatch Agent installed!---"
+        else
+            echo "---Cloudwatch Agent installation failed---"
+            cleanup_downloads
+            exit 1
+        fi
+    fi
+    echo "===> Done!"
+}
+
+function install_ssm_agent() {
+    echo "===> Installing SSM Agent"
+    if (command -v amazon-ssm-agent 2>&1); then
+        echo "---SSM Agent is already installed!---"
+    else
+        curl https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/debian_amd64/amazon-ssm-agent.deb -o "$temp_dir/amazon-ssm-agent.deb"
+        dpkg -i "$temp_dir"/amazon-ssm-agent.deb 
+    if (command -v amazon-ssm-agent 2>&1); then
+            echo "---SSM Agent installed!---"
+        else
+            echo "---SSM Agent installation failed---"
+            cleanup_downloads
+            exit 1
+        fi
+    fi
+    echo "===> Done!"
+}
+
+function install_aws_cli() {
+    echo "===> Installing aws cli if not installed"
+    if (command -v aws 2>&1); then
+        echo "---aws cli is already installed!---"
+    else
+        curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "$temp_dir/awscliv2.zip"
+        unzip -qq "$temp_dir"/awscliv2.zip -d "$temp_dir"
+        ."$temp_dir"/aws/install
+        if (command -v aws 2>&1); then
+            echo "---aws cli installed!---"
+        else
+            echo "---aws cli installation failed---"
+            exit 1
+        fi
+    fi
+    echo "===> Done!"
+
+}
+function main() {
+        echo "==> Installing agents"
+	temp_dir=$(mktemp -d)
+        install_ssm_agent
+        install_cloudwatch_agent
+        cleanup_downloads
+}
+
+main
+
