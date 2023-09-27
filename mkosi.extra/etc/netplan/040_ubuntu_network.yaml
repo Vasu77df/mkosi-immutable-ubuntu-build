@@ -1,0 +1,14 @@
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    lo:
+      addresses: [169.254.169.254/32]
+      routes:
+        - to: 127.0.0.1
+          scope: host
+    nics:
+      match:
+        name: en*
+      dhcp4: true
+      dhcp-identifier: mac
