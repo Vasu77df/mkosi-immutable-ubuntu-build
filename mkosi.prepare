@@ -4,7 +4,7 @@ if [ "$container" != "mkosi" ]; then
     exec mkosi-chroot "$SCRIPT" "$@"
 fi
 
-set -eExuo pipefail
+set -eEuo pipefail
 
 trap "cleanup_downloads" ERR
 
