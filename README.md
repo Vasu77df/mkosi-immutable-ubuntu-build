@@ -40,7 +40,7 @@ git clone https://github.com/Vasu77df/mkosi-immutable-ubuntu-build.git
 
 - Change into the project directory and start the build.
 ```
-sudo mkosi -f
+sudo mkosi -f --debug 2>&1 | tee build.log
 ```
 
 - Once the build is complete you should see the built artifacts in the `build_output` dir
