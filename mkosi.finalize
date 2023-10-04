@@ -1,13 +1,13 @@
 #!/bin/bash
 
 if [ "$container" != "mkosi" ]; then
-    exec mkosi-chroot "$SCRIPT" "$@"
+	exec mkosi-chroot "$SCRIPT" "$@"
 fi
 
 set -exuo pipefail
 
 function set_user_passwd() {
-	echo "immutable-user:Iamimmutable" | chpasswd -c SHA256 
+	echo "immutable-user:Iamimmutable" | chpasswd -c SHA256
 }
 
 function main() {
