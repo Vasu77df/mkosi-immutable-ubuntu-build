@@ -1,0 +1,3 @@
+/data_images/home.img /home ext4 loop=/dev/loop20,rw,defaults,auto,noatime,nodiratime,x-systemd.before=local-fs.target 0 0
+# /data_images/var.img /var ext4 loop=/dev/loop21,rw,defaults,x-initrd.mount 0 1
+
