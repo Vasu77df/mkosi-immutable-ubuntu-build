@@ -1,12 +1,14 @@
 [Unit]
 Description=Mount the data partition
+Requires=multi-user.target
+After=local-fs.target
+After=multi-user.target
 
 [Mount]
 What=/dev/disk/by-label/persistent_part
 Where=/data_images
 Type=ext4
-Options=defaults,rw,noatime
-#TimeoutSec=seconds
+Options=rw,noatime
 
 [Install]
 WantedBy=multi-user.target
