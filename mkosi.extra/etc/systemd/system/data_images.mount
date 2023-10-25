@@ -1,8 +1,9 @@
 [Unit]
 Description=Mount the data partition
 Requires=multi-user.target
-After=local-fs.target
 After=multi-user.target
+Conflicts=umount.target
+DefaultDependencies=no
 
 [Mount]
 What=/dev/disk/by-label/persistent_part
