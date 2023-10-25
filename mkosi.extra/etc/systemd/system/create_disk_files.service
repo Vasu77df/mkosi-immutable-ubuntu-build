@@ -1,7 +1,7 @@
 [Unit]
 Description=Building disk images once data partition is mounted
 Requires=data_images.mount
-After=multi-user.target data_images.mount
+After=basic.target data_images.mount
 DefaultDependencies=no
 
 

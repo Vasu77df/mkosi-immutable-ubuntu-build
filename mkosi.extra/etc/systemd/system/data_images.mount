@@ -1,7 +1,7 @@
 [Unit]
 Description=Mount the data partition
-Requires=multi-user.target
-After=multi-user.target
+Requires=basic.target
+After=basic.target
 Conflicts=umount.target
 DefaultDependencies=no
 
@@ -12,4 +12,4 @@ Type=ext4
 Options=rw,noatime
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=basic.target

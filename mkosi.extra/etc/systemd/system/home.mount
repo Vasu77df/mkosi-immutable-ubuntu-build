@@ -1,16 +1,16 @@
 [Unit]
 Description=Mount persistent home
 Requires=create_disk_files.service
-After=multi-user.target data_images.mount create_disk_files.service
-Conflicts=shutdown.target
+After=data_images.mount create_disk_files.service
+Conflicts=umount.target
 DefaultDependencies=no
 
 [Mount]
 What=/data_images/home.img
 Where=/home
 Type=ext4
-Options=loop=/dev/loop20,rw,defaults,auto,noatime,nodiratime
+Options=loop,rw,defaults,auto,noatime,nodiratime
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=basic.target
 
