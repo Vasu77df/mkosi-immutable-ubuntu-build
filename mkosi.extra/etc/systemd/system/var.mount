@@ -1,15 +1,15 @@
 [Unit]
-Description=Mount persistent home
+Description=Mount persistent var
 Requires=create_disk_files.service
 After=data_images.mount create_disk_files.service
 Conflicts=umount.target
 DefaultDependencies=no
 
 [Mount]
-What=/data_images/home.img
+What=/data_images/var.img
 Where=/var
 Type=ext4
-Options=loop=/dev/loop20,rw,defaults,auto,noatime,nodiratime
+Options=loop=/dev/loop21,rw,defaults,auto,noatime,nodiratime
 
 [Install]
 WantedBy=basic.target

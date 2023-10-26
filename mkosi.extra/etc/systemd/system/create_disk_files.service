@@ -11,4 +11,4 @@ ExecStart=/usr/local/bin/build_disk_images.sh
 StandardOutput=journal
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=basic.target
