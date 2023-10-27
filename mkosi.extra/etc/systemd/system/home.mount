@@ -7,7 +7,7 @@ DefaultDependencies=no
 
 [Mount]
 What=/data_images/home.img
-Where=/var
+Where=/home
 Type=ext4
 Options=loop=/dev/loop20,rw,defaults,auto,noatime,nodiratime
 
