@@ -15,7 +15,7 @@ function setup_data_images() {
     declare -a images=("home" "var")
     if [ -d "$DATA_STORE" ]; then
 	for image in "${images[@]}"; do
-	    if [ -e "$DATA_STORE/$image.img"]; then
+	    if [ -e "$DATA_STORE/$image.img" ]; then
 		echo "Sparse disk file for $image already exists in $DATA_STORE"
 	    else
 		echo "==> Creating sparse disks file for $image"
