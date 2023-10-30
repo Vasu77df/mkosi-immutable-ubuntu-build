@@ -1,7 +1,8 @@
 [Unit]
 Description=Mount the data partition
-Requires=basic.target
-After=basic.target
+Requires=local-fs-pre.target
+After=local-fs-pre.target
+Before=local-fs.target
 Conflicts=umount.target
 DefaultDependencies=no
 
@@ -10,6 +11,3 @@ What=/dev/disk/by-label/persistent_part
 Where=/data_images
 Type=ext4
 Options=rw,noatime
-
-[Install]
-WantedBy=basic.target
