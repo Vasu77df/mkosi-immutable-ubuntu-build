@@ -5,8 +5,9 @@ ARG DEBIAN_FRONTEND=noninteractive
 
 # Install dependencies.
 RUN cat /etc/apt/sources.list.d/*
+RUN echo "deb http://ftp.de.debian.org/debian sid main" >> /etc/apt/sources.list
 RUN apt update
-RUN apt upgrade -y
+# RUN apt upgrade -y
 # RUN apt install -y --fix-broken libreadline8
 RUN apt install --fix-broken --yes --no-install-recommends \
        build-essential \
@@ -30,7 +31,7 @@ RUN apt install --fix-broken --yes --no-install-recommends \
        systemd-boot \
        systemd-sysv \
        mtools \
-#       ubuntu-keyring \
+       ubuntu-keyring \
        zstd \
     && rm --force --recursive /var/lib/apt/lists/* \
     && rm --force --recursive /usr/share/doc \
