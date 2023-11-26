@@ -1,0 +1,16 @@
+[Unit]
+Description=Bind mount for persistent /greengrass
+Requires=local.mount
+After=local-fs-pre.target local.mount
+Before=local-fs.target umount.target
+Conflicts=umount.target
+DefaultDependencies=no
+
+[Mount]
+What=/local/bind_dirs/greengrass
+Where=/greengrass
+Type=none
+Options=bind
+
+[Install]
+WantedBy=local-fs.target

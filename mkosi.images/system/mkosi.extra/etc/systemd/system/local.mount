@@ -1,13 +1,17 @@
+# Mounts the persistent data partition
 [Unit]
 Description=Mount the data partition
 Requires=local-fs-pre.target
 After=local-fs-pre.target
-Before=local-fs.target
+Before=local-fs.target umount.target
 Conflicts=umount.target
 DefaultDependencies=no
 
 [Mount]
-What=/dev/disk/by-label/persistent_part
-Where=/data_images
+What=/dev/disk/by-label/local
+Where=/local
 Type=ext4
 Options=rw,noatime
+
+[Install]
+WantedBy=local-fs.target

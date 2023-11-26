@@ -1,46 +1,49 @@
-FROM debian:unstable
+FROM public.ecr.aws/debian/debian:trixie
 LABEL maintainer="Vasudevan Perumal"
 
 ARG DEBIAN_FRONTEND=noninteractive
 
 # Install dependencies.
-RUN apt-get update \
-    && apt-get install --yes --no-install-recommends \
+RUN cat /etc/apt/sources.list.d/*
+RUN apt update
+RUN apt upgrade -y
+# RUN apt install -y --fix-broken libreadline8
+RUN apt install --fix-broken --yes --no-install-recommends \
        build-essential \
+       bubblewrap \
        cpio \
        curl \
        dosfstools \
        e2fsprogs \
        git \
        iproute2 \
-       libffi-dev \
-       libssl-dev \
        procps \
        python3-apt \
        python3-dev \
        python3-pip \
        python3-setuptools \
+       python3-venv \
        python3-wheel \
        sudo \
        squashfs-tools \
        systemd \
        systemd-boot \
        systemd-sysv \
-       mkosi \
        mtools \
-       ubuntu-keyring \
+#       ubuntu-keyring \
        zstd \
     && rm --force --recursive /var/lib/apt/lists/* \
     && rm --force --recursive /usr/share/doc \
     && rm --force --recursive /usr/share/man \
-    && apt-get clean
+    && apt clean
 
 
-WORKDIR /root/mkosi
+# WORKDIR /root/image_build
 
-RUN git clone https://github.com/Vasu77df/mkosi-immutable-ubuntu-build.git
+# RUN git clone https://github.com/Vasu77df/mkosi-immutable-ubuntu-build.git
 
-WORKDIR /root/mkosi/mkosi-immutable-ubuntu-build
+WORKDIR /root/image_build/mkosi-immutable-ubuntu-build
+COPY . /root/image_build/mkosi-immutable-ubuntu-build
 RUN chmod 600 mkosi.rootpw
 
 # Allow installing stuff to system Python.
@@ -48,5 +51,9 @@ RUN rm --force /usr/lib/python3.11/EXTERNALLY-MANAGED
 RUN pip3 install --upgrade pip
 RUN pip3 install pefile
 
-# quick check if I have access to mirrors locally before I kick of the generic image build
-CMD mkosi
+RUN python3 -m venv mkosivenv
+RUN mkosivenv/bin/pip install git+https://github.com/systemd/mkosi.git
+RUN mkosivenv/bin/mkosi --version
+
+ENTRYPOINT ["/usr/bin/bash"]
+# CMD mkosivenv/bin/mkosi -f

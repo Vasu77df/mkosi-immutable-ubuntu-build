@@ -1,0 +1,14 @@
+[Unit]
+Description=Building data files once data partition is mounted
+Requires=local.mount
+After=local-fs-pre.target local.mount
+Before=local-fs.target home.mount
+DefaultDependencies=no
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/build_data_files.sh
+StandardOutput=journal
+
+[Install]
+WantedBy=local-fs.target
