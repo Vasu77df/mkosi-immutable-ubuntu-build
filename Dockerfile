@@ -38,12 +38,11 @@ RUN apt install --fix-broken --yes --no-install-recommends \
     && apt clean
 
 
-# WORKDIR /root/image_build
+WORKDIR /root/image_build
 
-# RUN git clone https://github.com/Vasu77df/mkosi-immutable-ubuntu-build.git
+RUN git clone https://github.com/Vasu77df/mkosi-immutable-ubuntu-build.git
 
 WORKDIR /root/image_build/mkosi-immutable-ubuntu-build
-COPY . /root/image_build/mkosi-immutable-ubuntu-build
 RUN chmod 600 mkosi.rootpw
 
 # Allow installing stuff to system Python.
