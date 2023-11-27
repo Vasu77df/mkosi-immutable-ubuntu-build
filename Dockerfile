@@ -5,6 +5,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 
 # Install dependencies.
 RUN cat /etc/apt/sources.list.d/*
+# To get access to the ubuntu-keyring package
 RUN echo "deb http://ftp.de.debian.org/debian sid main" >> /etc/apt/sources.list
 RUN apt update
 # RUN apt upgrade -y

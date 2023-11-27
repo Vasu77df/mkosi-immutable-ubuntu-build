@@ -8,11 +8,11 @@ if [ "$(id -u)" != 0 ]; then
     exit 1
 fi
 
-DATA_STORE="/data_images"
+DATA_STORE="/local"
 
 function setup_data_images() {
     echo "==> Building data images"
-    declare -a images=("home" "var")
+    declare -a images=("home")
     if [ -d "$DATA_STORE" ]; then
 	for image in "${images[@]}"; do
 	    if [ -e "$DATA_STORE/$image.img" ]; then
