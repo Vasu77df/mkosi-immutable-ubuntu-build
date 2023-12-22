@@ -1,4 +1,4 @@
-FROM public.ecr.aws/amazonlinux/amazonlinux:latest
+FROM public.ecr.aws/docker/library/debian:trixie
 LABEL maintainer="Vasudevan Perumal"
 
 ARG DEBIAN_FRONTEND=noninteractive
