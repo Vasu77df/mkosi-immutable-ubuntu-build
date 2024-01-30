@@ -2,7 +2,7 @@
 [Unit]
 Description=Mount the data partition
 Requires=local-fs-pre.target
-After=local-fs-pre.target
+After=local-fs-pre.target systemd-repart.service
 Before=local-fs.target umount.target
 Conflicts=umount.target
 DefaultDependencies=no
