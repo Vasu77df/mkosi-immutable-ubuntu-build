@@ -1,5 +1,0 @@
-# Keeping this for reference, it isn't used
-# /dev/disk/by-label/persistent_part /data_images ext4 defaults,auto 0 0 
-# /data_images/home.img /home ext4 loop=/dev/loop20,rw,defaults,auto,noatime,nodiratime 0 0
-# /data_images/var.img /var ext4 loop=/dev/loop21,rw,defaults,x-initrd.mount 0 1
-
