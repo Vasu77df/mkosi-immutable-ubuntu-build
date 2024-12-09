@@ -1,0 +1,17 @@
+[Unit]
+Description=Bind mount for persistent /var/lib/docker
+Requires=local.mount
+After=local-fs-pre.target local.mount
+Before=local-fs.target umount.target
+Conflicts=umount.target
+DefaultDependencies=no
+
+[Mount]
+What=/local/persistent/var/lib/docker
+Where=/var/lib/docker
+Type=none
+Options=bind
+
+[Install]
+WantedBy=local-fs.target
+

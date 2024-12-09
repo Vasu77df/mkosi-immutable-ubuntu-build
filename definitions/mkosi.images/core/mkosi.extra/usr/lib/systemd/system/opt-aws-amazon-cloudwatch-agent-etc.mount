@@ -1,0 +1,17 @@
+[Unit]
+Description=Bind mount for persistent /opt/aws/amazon-cloudwatch-agent/etc
+Requires=local.mount
+After=local-fs-pre.target local.mount
+Before=local-fs.target umount.target
+Conflicts=umount.target
+DefaultDependencies=no
+
+[Mount]
+What=/local/persistent/opt/aws/amazon-cloudwatch-agent/etc
+Where=/opt/aws/amazon-cloudwatch-agent/etc
+Type=none
+Options=bind
+
+[Install]
+WantedBy=local-fs.target
+

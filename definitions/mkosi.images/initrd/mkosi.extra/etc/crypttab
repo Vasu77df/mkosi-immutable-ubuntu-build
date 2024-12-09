@@ -1,2 +1,0 @@
-# just an example, use this later.
-# cryptroot /dev/disk/by-partlabel/root_a none luks,discard,tpm2-device=auto

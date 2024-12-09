@@ -2,11 +2,11 @@
 set -euo pipefail
 
 function set_user_passwd() {
-	echo "immutable-user:Iamimmutable" | chpasswd -c SHA256
+  echo "immutable-user:Iamimmutable" | chpasswd -c SHA256
 }
 
 function main() {
-	set_user_passwd
+  set_user_passwd
 }
 
 main

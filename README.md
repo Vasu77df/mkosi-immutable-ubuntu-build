@@ -1,90 +1,164 @@
-# mkosi-immutable-ubuntu-build
+# Immutable AWS Ready Ubuntu Build
 
-A readonly Ubuntu build with squashfs and an UKI
+A readonly Ubunut variant, meant for AWS Native Cloud connected edge devices.
 
-In this project we will be trying to build a Immutable Ubuntu Variant that has a readonly root filesystem, a overlay scheme with either a tmpfs overlay or presistent overlay, and finally booting using an UKI for robust trusted boot. Eventually we'll be adding an A/B image based update mechanism and others bells and whistles.
+In this project we will be build a Immutable Ubuntu Variant that has a readonly root, setup with a tmpfs overlay through `systemd-volatile=overlay`. 
 
-We will be using [mkosi](https://github.com/systemd/mkosi) to build our image.
+This image ships with a boot partition with a Unified Kernel image, ready for measured boot implementation, a root partition, and data partition. Eventually we'll be adding an A/B image based update scheme and others bells and whistles.
 
-## Setting up a build environment
+Appropriate bind mounts against certain directories like `/var/lib/docker`, and `/etc/amazon/ssm` is setup for per device unique configuration or variable data persistence. 
 
-I was short on time so while working on this so I wanted to get a build environment up and running quick.
+The disk image can be shipped and install is as simple as `dd`, to a device's disk.
 
-**mkosi** and other newer systemd tools are not available in all distros yet, so we either have to use a bleeding edge distro or an unstable branch for now to start building.
+We use [mkosi](https://github.com/systemd/mkosi) to build our image.
 
-The quickest way I found was to spin up a Debian Sid EC2 instance.
+## Setting up the build environment
 
-Here are the steps to get started.
-- Head over to the EC2 console in your AWS account.
-- Got to AMI Catalog and search for Debian Sid.
-- You would find daily builds of AMIs, select an amd64 one as that's what we'll be using here.
-- Now setup you ec2 instance, with necessary settings(make sure you setup your ssh keys)
-- Launch the instance.
-- Now ssh into the instance.
-### Installing the build tools.
+My eventual goal is run these builds in AWS codebuild as that's what I have access to, at work. I also use Ublue's Bluefin OS for developement so installing `mkosi` direct on my laptop is not great, hence we model the build as a containerized task.
 
-Install these packages:
-
-```
-sudo apt install systemd-boot mtools mkosi 
-```
-
-Now we should have all the build tools necessary.
-## Running the build.
+To do so we setup a build environment as a container image that will host our build. This build environement could then plugged into AWS CodeBuild that will execute the build as part CI/CD.
 
 - Clone this project
-```
-sudo apt install git
+```shell
 git clone https://github.com/Vasu77df/mkosi-immutable-ubuntu-build.git
 ```
 
-- Change into the project directory and start the build.
+- Build the OS build environment container
+```shell
+cd mkosi-immutable-ubuntu-build
+sudo docker build . -t os_build_env:latest
 ```
-sudo mkosi -f --debug 2>&1 | tee build.log
+
+## Running the build.
+
+Now it's just simple as running the build container and then invoking mkosi
+
+- Run the Build container and get a shell
+
+```shell
+sudo docker run -it --privileged os_buidl_env:latest
 ```
+
+- Triggering the build
+
+```shell
+/mkosivenv/bin/mkosi build
+```
+
+- Coping the artifacts
+If you want to you could bind mount the `/root/build_env/build_output` dir in the container to a location on your host or you can just simply docker cp
+
+```shell
+sudo docker ps -a # get your container's name
+sudo docker cp container_name:/root/build_env/build_output .
+```
+
+## Inpecting the Artifacts.
 
 - Once the build is complete you should see the built artifacts in the `build_output` dir
-```
-host@build_host:~/mkosi-immutable-ubuntu-build$ ls -alh build_output/
-total 2.3G
-drwxr-xr-x 2 admin admin 4.0K Sep 26 19:22 .
-drwxr-xr-x 6 admin admin 4.0K Sep 26 19:22 ..
--rw-r--r-- 1 admin admin   15 Sep 26 19:18 .gitignore
-lrwxrwxrwx 1 admin admin    9 Sep 26 19:22 image -> image.raw
-lrwxrwxrwx 1 admin admin   21 Sep 26 19:21 image-initrd -> image-initrd.cpio.zst
--rw-r--r-- 1 admin admin  34M Sep 26 19:21 image-initrd.cpio.zst
--rw-r--r-- 1 admin admin  479 Sep 26 19:22 image.SHA256SUMS
--rw-r--r-- 1 admin admin 230M Sep 26 19:21 image.efi
--rw-r--r-- 1 admin admin 512M Sep 26 19:21 image.esp.raw
--rw-r--r-- 1 admin admin 217M Sep 26 19:21 image.initrd
--rw-r--r-- 1 admin admin 1.2G Sep 26 19:21 image.raw
--rw-r--r-- 1 admin admin 676M Sep 26 19:21 image.root-x86-64.raw
--rw------- 1 admin admin  14M Sep 26 19:21 image.vmlinuz
-```
-
-`image.raw` is our bootable OS disk image, we'll go over the other artifacts in a section below.
-## Booting the Image. 
-
-A quick way to test drive the build image is spinning up a `systemd-nspawn` container on the build host. You can do so with this command.
 
 ```
-sudo mkosi --incremental boot
+⋊> ~/w/mkosi-immutable-ubuntu-build on main ⨯ ls -alh build_output                                                                                                 17:58:50
+total 33G
+drwxr-xr-x 1 root    root     348 Dec  8 17:19 ./
+drwxr-xr-x 1 vasuper vasuper  134 Dec  8 17:58 ../
+drwxr-xr-x 1 root    root     202 Dec  8 17:15 base/
+drwxr-xr-x 1 root    root     302 Dec  8 17:16 core/
+-rw-r--r-- 1 root    root      15 Nov 28 18:47 .gitignore
+lrwxrwxrwx 1 root    root       9 Dec  8 17:19 image -> image.raw
+-rw-r--r-- 1 root    root    447M Dec  8 17:19 image.efi
+-rw-r--r-- 1 root    root    2.0G Dec  8 17:19 image.esp.raw
+-rw-r--r-- 1 root    root    432M Dec  8 17:19 image.initrd
+-rw-r--r-- 1 root    root     10G Dec  8 17:19 image.linux-generic.raw
+-rw-r--r-- 1 root    root    2.1K Dec  8 17:19 image.manifest
+-rw-r--r-- 1 root    root     16G Dec  8 17:19 image.raw
+-rw-r--r-- 1 root    root    3.8G Dec  8 17:19 image.root-x86-64.raw
+-rw-r--r-- 1 root    root     569 Dec  8 17:19 image.SHA256SUMS
+-rw-r--r-- 1 root    root     15M Dec  8 17:19 image.vmlinuz
+lrwxrwxrwx 1 root    root      15 Dec  8 17:16 initrd -> initrd.cpio.zst
+-rw-r--r-- 1 root    root     43M Dec  8 17:16 initrd.cpio.zst
 ```
 
-To exit this container press `Ctrl` + hit `]`  atleast three times.
+- `image` or to be exact `image.raw` is our bootable artifact, you can inspect it with `systemd-dissect`
 
-I'll also go over instructions on how to boot the OS image on VirtualBox.
-- scp down `image.raw` to your machine that has VirtualBox.
-- Convert the OS disk image into an VDI, with the command
+
 ```
- VBoxManage convertdd image.raw  image.vdi --format VDI
+sudo systemd-dissect --no-pager image.raw
 ```
 
-- Now create virtual machine in VirtualBox and use the VDI as the hard disk for it.
-- Once you have create the virtual machine make sure you enable EFI in the settings before you boot. 
-- Now boot.
+**Output**:
+```
+      Name: image.raw
+      Size: 15.7G
+ Sec. Size: 512
+     Arch.: x86-64
 
-At this time it should just autologin into a root shell.
+Image UUID: 3644712f-284e-4a62-9dc4-6422968e1ab0
+  Hostname: immutable-noble
+Machine ID: 5ba2430ae4ad4d17b28eef6f6ad47935
+OS Release: PRETTY_NAME=Ubuntu 24.04.1 LTS
+            NAME=Ubuntu
+            VERSION_ID=24.04
+            VERSION=24.04.1 LTS (Noble Numbat)
+            VERSION_CODENAME=noble
+            ID=ubuntu
+            ID_LIKE=debian
+            HOME_URL=https://www.ubuntu.com/
+            SUPPORT_URL=https://help.ubuntu.com/
+            BUG_REPORT_URL=https://bugs.launchpad.net/ubuntu/
+            PRIVACY_POLICY_URL=https://www.ubuntu.com/legal/terms-and-policies/privacy-policy
+            UBUNTU_CODENAME=noble
+            LOGO=ubuntu-logo
+
+    Use As: ✓ bootable system for UEFI
+            ✓ bootable system for container
+            ✗ portable service
+            ✗ initrd
+            ✗ sysext for system
+            ✗ sysext for portable service
+            ✗ sysext for initrd
+            ✗ confext for system
+            ✗ confext for portable service
+            ✗ confext for initrd
+
+RW DESIGNATOR PARTITION UUID                       PARTITION LABEL FSTYPE ARCHITECTURE VERITY GROWFS NODE         PARTNO
+rw root       e016523a-ac25-43d0-acc0-bb25606e8ae5 root-x86-64     ext4   x86-64       no     yes    /dev/loop0p2      2
+rw esp        b179c7c5-5c48-4fe9-aa56-06c6b368209b esp             vfat   -            -      no     /dev/loop0p1      1
+
+```
+
+- `fdisk` output to see all partitions
+
+```
+sudo fdisk -l image.raw
+```
+
+**Output**:
+```
+Disk image.raw: 15.75 GiB, 16911544320 bytes, 33030360 sectors
+Units: sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disklabel type: gpt
+Disk identifier: 3644712F-284E-4A62-9DC4-6422968E1AB0
+
+Device        Start      End  Sectors  Size Type
+image.raw1     2048  4196351  4194304    2G EFI System
+image.raw2  4196352 12058799  7862448  3.7G Linux root (x86-64)
+image.raw3 12058800 33030319 20971520   10G Linux filesystem
+```
+
+
+## Booting the image.
+
+`mkosi` itself has various boot options like `qemu` for hardware virtualization and `systemd-nspawn` containers, you can invoke them on your own as well for exampel for `systemd-nspawn`
+
+```
+sudo systemd-nspawn -bi image.raw
+```
+
+*Note: nspawn is container virtualization so some mount units are bound to fail as it does not setup the data partition.*
+
 ## Explaining what is going in here.
 
 [mkosi](https://github.com/systemd/mkosi) is a declarative bespoke OS Image build tool. 
@@ -141,13 +215,8 @@ You will also see `10-root.conf` , this is where we declare the root partition. 
 
 More info on all the options can be found in the manpages here:
 - https://www.freedesktop.org/software/systemd/man/repart.d.html#
-### The mkosi.cache/ dir
 
-You would notice this is an empty dir but upon first build you will see this dir populate with the downloaded debian packages. 
-
-If you run `sudo mkosi -f --incremental`  the tool will look at the directory to read and build the locally cached packages.
-
-## A glance at the build artifacts.
+## Another glance at the build artifacts.
 
 These are all the build artifacts
 
@@ -171,8 +240,10 @@ lrwxrwxrwx 1 admin admin   21 Sep 26 19:21 image-initrd -> image-initrd.cpio.zst
 
 - `image-initrd.cpio.zst` is the compressed built initrd
 - `image.SHA256SUM` is the Checksum file, look at the sections above for the output of this file
+- `image.manifest` is the SBOM of the image build
 - `image.efi` : this is our UKI(Unified Kernel Image) used for boot. 
-	- You can see this output of this with this command 
+
+You can see the sections of the UKI with `objdump`
 ```
 objdump -h image.efi 
 
@@ -245,11 +316,10 @@ Idx Name          Size      VMA               LMA               File off  Algn
 ```
 
 - `image.initrd` is the uncompressed initrd
-- The other artifacts you see have been explained in the `[Output]` sub-section of the mkosi.conf section, hop over there to learn more about it there.
+
 # Future work.
 - Look into building a custom initrd and supplying it to the build using `Initrd`
--  With a custom initrd define an overlay scheme with persistent partition or a tmpfs.
-- Make the image actually work i.e networking users etc.
+- With a custom initrd define an overlay scheme with persistent partition or a tmpfs.
 - Add options of disk encryption and verity,
 - Add options for measured boot.
 # Some really good references;

@@ -1,0 +1,95 @@
+{
+  "manifest_version": 1,
+  "config": {
+    "name": "image",
+    "distribution": "ubuntu",
+    "architecture": "x86-64",
+    "release": "noble"
+  },
+  "packages": [
+    {
+      "type": "deb",
+      "name": "amd64-microcode",
+      "version": "3.20231019.1ubuntu2.1",
+      "architecture": "amd64"
+    },
+    {
+      "type": "deb",
+      "name": "intel-microcode",
+      "version": "3.20240910.0ubuntu0.24.04.1",
+      "architecture": "amd64"
+    },
+    {
+      "type": "deb",
+      "name": "iucode-tool",
+      "version": "2.3.1-3build1",
+      "architecture": "amd64"
+    },
+    {
+      "type": "deb",
+      "name": "linux-base",
+      "version": "4.5ubuntu9",
+      "architecture": "all"
+    },
+    {
+      "type": "deb",
+      "name": "linux-firmware",
+      "version": "20240318.git3b128b60-0ubuntu2.5",
+      "architecture": "amd64"
+    },
+    {
+      "type": "deb",
+      "name": "linux-generic-hwe-24.04",
+      "version": "6.8.0-49.49",
+      "architecture": "amd64"
+    },
+    {
+      "type": "deb",
+      "name": "linux-headers-6.8.0-49",
+      "version": "6.8.0-49.49",
+      "architecture": "all"
+    },
+    {
+      "type": "deb",
+      "name": "linux-headers-6.8.0-49-generic",
+      "version": "6.8.0-49.49",
+      "architecture": "amd64"
+    },
+    {
+      "type": "deb",
+      "name": "linux-headers-generic-hwe-24.04",
+      "version": "6.8.0-49.49",
+      "architecture": "amd64"
+    },
+    {
+      "type": "deb",
+      "name": "linux-image-6.8.0-49-generic",
+      "version": "6.8.0-49.49",
+      "architecture": "amd64"
+    },
+    {
+      "type": "deb",
+      "name": "linux-image-generic-hwe-24.04",
+      "version": "6.8.0-49.49",
+      "architecture": "amd64"
+    },
+    {
+      "type": "deb",
+      "name": "linux-modules-6.8.0-49-generic",
+      "version": "6.8.0-49.49",
+      "architecture": "amd64"
+    },
+    {
+      "type": "deb",
+      "name": "linux-modules-extra-6.8.0-49-generic",
+      "version": "6.8.0-49.49",
+      "architecture": "amd64"
+    },
+    {
+      "type": "deb",
+      "name": "wireless-regdb",
+      "version": "2022.06.06-0ubuntu2",
+      "architecture": "all"
+    }
+  ]
+}

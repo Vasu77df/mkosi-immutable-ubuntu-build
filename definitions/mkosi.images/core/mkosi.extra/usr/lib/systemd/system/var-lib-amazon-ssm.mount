@@ -1,0 +1,17 @@
+[Unit]
+Description=Bind mount for persistent /var/lib/amazon/ssm
+Requires=local.mount
+After=local-fs-pre.target local.mount
+Before=local-fs.target umount.target
+Conflicts=umount.target
+DefaultDependencies=no
+
+[Mount]
+What=/local/persistent/var/lib/amazon/ssm
+Where=/var/lib/amazon/ssm
+Type=none
+Options=bind
+
+[Install]
+WantedBy=local-fs.target
+

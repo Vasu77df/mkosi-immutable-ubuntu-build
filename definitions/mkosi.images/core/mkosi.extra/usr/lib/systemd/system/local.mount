@@ -1,0 +1,18 @@
+# Mounts the persistent data partition
+[Unit]
+Description=Mount the data partition
+Requires=local-fs-pre.target
+After=local-fs-pre.target systemd-repart.service
+Before=local-fs.target umount.target
+Conflicts=umount.target
+DefaultDependencies=no
+
+[Mount]
+What=/dev/disk/by-label/persistent
+Where=/local
+Type=ext4
+Options=rw,noatime
+
+[Install]
+WantedBy=local-fs.target
+
