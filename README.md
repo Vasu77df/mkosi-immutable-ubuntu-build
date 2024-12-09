@@ -1,6 +1,6 @@
-# Immutable AWS Ready Ubuntu Build
+# AWS Ready Immutable Ubuntu Build for Edge devices
 
-A readonly Ubunut variant, meant for AWS Native Cloud connected edge devices.
+A readonly Ubuntu variant, meant for AWS Native Cloud connected edge devices.
 
 In this project we will be build a Immutable Ubuntu Variant that has a readonly root, setup with a tmpfs overlay through `systemd-volatile=overlay`. 
 
@@ -11,6 +11,13 @@ Appropriate bind mounts against certain directories like `/var/lib/docker`, and 
 The disk image can be shipped and install is as simple as `dd`, to a device's disk.
 
 We use [mkosi](https://github.com/systemd/mkosi) to build our image.
+
+The image built includes following
+- Docker and docker compose pre-installed
+- SSM agent
+- CloudWatch agent
+- Prepped for greengrass bootstrap with a persistent bind mount unit for `/greengrass`.
+- rauc for image based os updates.
 
 ## Setting up the build environment
 
