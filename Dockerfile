@@ -34,64 +34,64 @@ ARG DEBIAN_FRONTEND=noninteractive
 # zstd                  :compression library used in building initrd
 
 # Install Everything
-RUN apt update -y && apt upgrade -y && apt install -y \
-    aptly \
-    bubblewrap \
-    ca-certificates \
-    cpio \
-    curl \
-    debian-archive-keyring \
-    dosfstools \
-    e2fsprogs  \
-    git \
-    kmod \
-    procps \
-    python3-cryptography \
-    python3-pip \
-    python3-setuptools \
-    python3-venv \
-    python3-wheel \
-    rauc \
-    sbsigntool \
-    squashfs-tools \
-    systemd \
-    systemd-boot \
-    systemd-repart \
-    systemd-ukify \
-    systemd-container \
-    mtools \
-    tpm2-tools \
-    ubuntu-keyring \
-    unzip \
-    zstd
+RUN apt-get update -y && apt upgrade -y && apt install -y \
+  aptly \
+  bubblewrap \
+  ca-certificates \
+  cpio \
+  curl \
+  debian-archive-keyring \
+  dosfstools \
+  e2fsprogs  \
+  git \
+  kmod \
+  procps \
+  python3-cryptography \
+  python3-pip \
+  python3-setuptools \
+  python3-venv \
+  python3-wheel \
+  rauc \
+  sbsigntool \
+  squashfs-tools \
+  systemd \
+  systemd-boot \
+  systemd-repart \
+  systemd-ukify \
+  systemd-container \
+  mtools \
+  tpm2-tools \
+  ubuntu-keyring \
+  unzip \
+  zstd
 
-RUN apt install -y libc6 groff less \
-    && curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" \
-    && ls -alh \
-    && unzip ./awscliv2.zip \
-    && ./aws/install
+RUN apt-get install -y libc6 groff less \
+  && curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" \
+  && ls -alh \
+  && unzip ./awscliv2.zip \
+  && ./aws/install
 
 # Install amazon-ssm-agent to allow access in CodeBuild
 RUN curl -o /tmp/amazon-ssm-agent.deb https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/debian_amd64/amazon-ssm-agent.deb \
-    && dpkg -i /tmp/amazon-ssm-agent.deb \
-    && curl -o /etc/amazon/ssm/amazon-ssm-agent.json https://raw.githubusercontent.com/aws/aws-codebuild-docker-images/master/ubuntu/standard/5.0/amazon-ssm-agent.json
+  && dpkg -i /tmp/amazon-ssm-agent.deb \
+  && curl -o /etc/amazon/ssm/amazon-ssm-agent.json https://raw.githubusercontent.com/aws/aws-codebuild-docker-images/master/ubuntu/standard/5.0/amazon-ssm-agent.json
 
 
 # cleanup
 RUN rm --force --recursive /var/lib/apt/lists/* \
-    && rm --force --recursive /usr/share/doc \
-    && rm --force --recursive /usr/share/man \
-    && apt clean
+  && rm --force --recursive /usr/share/doc \
+  && rm --force --recursive /usr/share/man \
+  && apt clean
 
 # Allow installing stuff to system Python.
 RUN rm --force /usr/lib/python3.12/EXTERNALLY-MANAGED && \
-    apt-get update && \
-    apt-get install -y python3-pip && \
-    pip install pefile
+  apt-get update && \
+  apt-get install -y python3-pip && \
+  pip install pefile
 
 RUN python3 -m venv mkosivenv \
-    && mkosivenv/bin/pip install git+https://github.com/systemd/mkosi.git@v24.3 \
-    && mkosivenv/bin/mkosi --version
+  && mkosivenv/bin/pip install git+https://github.com/systemd/mkosi.git@v24.3 \
+  && mkosivenv/bin/mkosi --version
 
 # Make the logging more real time
 ENV PYTHONUNBUFFERED=TRUE
