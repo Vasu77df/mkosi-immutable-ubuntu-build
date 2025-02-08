@@ -90,7 +90,7 @@ RUN rm --force /usr/lib/python3.12/EXTERNALLY-MANAGED && \
   pip install pefile
 
 RUN python3 -m venv mkosivenv \
-  && mkosivenv/bin/pip install git+https://github.com/systemd/mkosi.git@v24.3 \
+  && mkosivenv/bin/pip install git+https://github.com/systemd/mkosi.git@v25.3\
   && mkosivenv/bin/mkosi --version
 
 # Make the logging more real time
